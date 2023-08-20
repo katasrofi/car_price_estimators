@@ -1,0 +1,175 @@
+<html>
+    <head>
+        <title>D3.js Import Data from Local CSV</title>
+        <!-- Sisipkan pustaka D3.js -->
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+        <style>
+            body{
+                margin: 0;
+                overflow: hidden;
+            }
+            .tick text{
+                font-size: 12px;
+            }
+            .menu-container{
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                display: flex;
+                justify-content: space-around;
+            }
+        </style>
+        </head>
+        <body>
+        <script type="module">
+            import { animatedPlot } from './carPlot.js';
+            import { menu } from './selectMenu.js';
+
+            const car_data = 
+            ['https://raw.githubusercontent.com/',
+            'katasrofi/car_price_estimators/', 
+            'main/train.csv',
+            ].join('')
+            
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+
+            // Change str to int (number)
+            const parseRow = (d) => {
+                d.sepal_length = +d.sepal_length;
+                //brand,
+                //model,
+                d.year = +d.year;
+                d.mileage = +d.mileage;
+                //engine,
+                d.engine_size = +d.engine_size;
+                //transmission,
+                d.automatic_transmission = +d.automatic_transmission;
+                //fuel_type,
+                //drivetrain,
+                d.min_mpg = +d.min_mpg;
+                d.max_mpg = +d.max_mpg;
+                d.damaged = +d.damaged;
+                d.first_owner = +d.first_owner;
+                d.personal_using = +d.personal_using;
+                d.turbo = +d.turbo;
+                d.alloy_wheels = +d.alloy_wheels;
+                d.adaptive_cruise_control = +d.adaptive_cruise_control;
+                d.navigation_system = +d.navigation_system;
+                d.power_liftgate = +d.power_liftgate
+                d.backup_camera = +d.backup_camera;
+                d.keyless_start = +d.keyless_start;
+                d.remote_start = +d.remote_start;
+                d['sunroof/moonroof'] = +d['sunroof/moonroof'];
+                d.automatic_emergency_braking = +d.automatic_emergency_braking;
+                d.stability_control = +d.stability_control;
+                d.leather_seats = +d.leather_seats;
+                d.memory_seat = +d.memory_seat;
+                d.third_row_seating = +d.third_row_seating;
+                d['apple_car_play/android_auto'] = +d['apple_car_play/android_auto'];
+                d.bluetooth = +d.bluetooth;
+                d.usb_port = +d.usb_port;
+                d.heated_seats = +d.heated_seats;
+                // interior_color,
+                // exterior_color,
+                d.price = +d.price;
+                return d;
+                };
+
+            const svg = d3
+                .select('body')
+                .append('svg')
+                .attr('width', width)
+                .attr('height', height);
+
+            const menuContainer = d3
+                .select('body')
+                .append('div')
+                .attr('class', 'menu-container');
+
+            const xMenu = menuContainer
+                .append('div');
+
+            const yMenu = menuContainer
+                .append('div');
+
+            const plot = animatedPlot()
+                    .width(width)
+                    .height(height)
+                    .data(await d3.csv(car_data, parseRow))
+                    .x_value((d) => d.price)
+                    .y_value((d) => d.price)
+                    .margin ({
+                        top: 20,
+                        bottom: 30,
+                        right: 40,
+                        left: 30,
+                    })
+                    .radius(2);
+
+            const columns = [
+                {value: 'brand', text: 'Brand'},
+                {value: 'model', text: 'Model'},
+                {value: 'year', text: 'Year'},
+                {value: 'mileage', text: 'Mileage'},
+                {value: 'engine', text: 'Engine'},
+                {value: 'engine_size', text: 'Engine Size'},
+                {value: 'transmission', text: 'Transmission'},
+                {value: 'automatic_transmission', text: 'Automatic Transmission'},
+                {value: 'fuel_type', text: 'Fuel Type'},
+                {value: 'drivetrain', text: 'Drivetrain'},
+                {value: 'min_mpg', text: 'Min MPG'},
+                {value: 'max_mpg', text: 'Max MPG'},
+                {value: 'damaged', text: 'Damaged'},
+                {value: 'first_owner', text: 'First Owner'},
+                {value: 'personal_using', text: 'Personal Using'},
+                {value: 'turbo', text: 'Turbo'},
+                {value: 'alloy_wheels', text: 'Alloy Wheels'},
+                {value: 'adaptive_cruise_control', text: 'Adaptive Cruise Control'},
+                {value: 'navigation_system', text: 'Navigation System'},
+                {value: 'power_liftgate', text: 'Power Liftgate'},
+                {value: 'backup_camera', text: 'Backup Camera'},
+                {value: 'keyless_start', text: 'Keyless Start'},
+                {value: 'remote_start', text: 'Remote Start'},
+                {value: 'sunroof/moonroof', text: 'Sunroof/Moonroof'},
+                {value: 'automatic_emergency_braking', text: 'Automatic Emergenci Braking'},
+                {value: 'stability_control', text: 'Stability Control'},
+                {value: 'leather_seats', text: 'Leather Seats'},
+                {value: 'memory_seat', text: 'Memory Seat'},
+                {value: 'third_row_seating', text: 'Third Row Seating'},
+                {value: 'apple_car_play/android_auto', text: 'Apper Car Play/Android Auto'},
+                {value: 'bluetooth', text: 'Bluetooth'},
+                {value: 'usb_port', text: 'USB Port'},
+                {value: 'heated_seats', text: 'Heated Seats'},
+                {value: 'interior_color', text: 'Interior Color'},
+                {value: 'exterior_color', text: 'Exterior Color'},
+                {value: 'price', text: 'Price'}
+            ]
+            
+            xMenu
+                .call(menu()
+                .id('x-menu')
+                .labelText('X: ')
+                .options(columns)
+                .on('change', column => {
+                    svg.call(plot.x_value(d => d[column]));
+                })
+                );
+            yMenu
+                .call(menu()
+                .id('y-menu')
+                .labelText('Y: ')
+                .options(columns)
+                .on('change', column => {
+                    svg.call(plot.y_value(d => d[column]));
+                })
+                );
+
+            const data = await d3.csv(car_data, parseRow);
+            plot.data(data);
+            svg.call(plot);
+
+        </script>
+        </body>
+    </html>
